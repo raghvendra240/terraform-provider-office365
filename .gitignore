@@ -5,4 +5,4 @@ vendor/
 credentials.json
 *.exe
 *.tf
-.tfvars
+terraform.tfvars
