@@ -28,13 +28,13 @@ func TestProvider_impl(t *testing.T) {
 }
 
 func testAccPreCheck(t *testing.T) {
-	if v := os.Getenv("TENANT_ID"); v == "" {
+	if v := os.Getenv("OFFICE365_TENANT_ID"); v == "" {
 		t.Fatal("TENANT_ID must be set for acceptance tests")
 	}
-	if v := os.Getenv("CLIENT_SECRET"); v == "" {
+	if v := os.Getenv("OFFICE365_CLIENT_SECRET"); v == "" {
 		t.Fatal("CLIENT_SECRET must be set for acceptance tests")
 	}
-	if v := os.Getenv("CLIENT_ID"); v == "" {
+	if v := os.Getenv("OFFICE365_CLIENT_ID"); v == "" {
 		t.Fatal("CLIENT_ID must be set for acceptance tests")
 	}
 }

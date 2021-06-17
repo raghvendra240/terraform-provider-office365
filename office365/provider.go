@@ -17,24 +17,24 @@ func Provider() *schema.Provider {
 			"client_id": &schema.Schema{
 				Type:        schema.TypeString,
 				Required:    true,
-				DefaultFunc: schema.EnvDefaultFunc("CLIENT_ID", ""),
+				DefaultFunc: schema.EnvDefaultFunc("OFFICE365_CLIENT_ID", ""),
 			},
 			"client_secret": &schema.Schema{
 				Type:        schema.TypeString,
 				Required:    true,
-				DefaultFunc: schema.EnvDefaultFunc("CLIENT_SECRET", ""),
+				DefaultFunc: schema.EnvDefaultFunc("OFFICE365_CLIENT_SECRET", ""),
 			},
 			"tenant_id": &schema.Schema{
 				Type:        schema.TypeString,
 				Required:    true,
-				DefaultFunc: schema.EnvDefaultFunc("TENANT_ID", ""),
+				DefaultFunc: schema.EnvDefaultFunc("OFFICE365_TENANT_ID", ""),
 			},
 		},
 		ResourcesMap: map[string]*schema.Resource{
-			"office365_user_manage": resourceUser(),
+			"office365_user": resourceUser(),
 		},
 		DataSourcesMap: map[string]*schema.Resource{
-			"office365_users": dataSourceUsers(),
+			"office365_user": dataSourceUsers(),
 		},
 		ConfigureContextFunc: providerConfigure,
 	}

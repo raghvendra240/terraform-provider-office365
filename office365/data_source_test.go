@@ -14,14 +14,14 @@ func TestAccUserDataSource_basic(t *testing.T) {
 			{
 				Config: testAccUserDataSourceConfig(),
 				Check: resource.ComposeAggregateTestCheckFunc(
-					resource.TestCheckResourceAttr("data.office365_users.test_user", "display_name", "Melissa Darrow"),
-					resource.TestCheckResourceAttr("data.office365_users.test_user", "job_title", "Marketing Director"),
-					resource.TestCheckResourceAttr("data.office365_users.test_user", "mail", ""),
-					resource.TestCheckResourceAttr("data.office365_users.test_user", "mobile_phone", "+1 206 555 0110"),
-					resource.TestCheckResourceAttr("data.office365_users.test_user", "office_location", "131/1105"),
-					resource.TestCheckResourceAttr("data.office365_users.test_user", "preferred_language", "en-US"),
-					resource.TestCheckResourceAttr("data.office365_users.test_user", "surname", "Darrow"),
-					resource.TestCheckResourceAttr("data.office365_users.test_user", "userprincipalname", "testread@clevertap1.onmicrosoft.com"),
+					resource.TestCheckResourceAttr("data.office365_user.test_user", "display_name", "Melissa Darrow"),
+					resource.TestCheckResourceAttr("data.office365_user.test_user", "job_title", "Marketing Director"),
+					resource.TestCheckResourceAttr("data.office365_user.test_user", "mail", ""),
+					resource.TestCheckResourceAttr("data.office365_user.test_user", "mobile_phone", "+1 206 555 0110"),
+					resource.TestCheckResourceAttr("data.office365_user.test_user", "office_location", "131/1105"),
+					resource.TestCheckResourceAttr("data.office365_user.test_user", "preferred_language", "en-US"),
+					resource.TestCheckResourceAttr("data.office365_user.test_user", "surname", "Darrow"),
+					resource.TestCheckResourceAttr("data.office365_user.test_user", "userprincipalname", "testread@clevertap1.onmicrosoft.com"),
 				),
 			},
 		},
@@ -30,7 +30,7 @@ func TestAccUserDataSource_basic(t *testing.T) {
 
 func testAccUserDataSourceConfig() string {
 	return fmt.Sprintf(`	  
-	    data "office365_users" "test_user" {
+	    data "office365_user" "test_user" {
                userprincipalname="testread@clevertap1.onmicrosoft.com"
 		 }
 	`)

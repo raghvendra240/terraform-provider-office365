@@ -19,6 +19,18 @@ terraform office365 provider is based on Terraform, this means that you need
 4. Generate a new key for your application by following [this](https://docs.microsoft.com/en-us/office/office-365-management-api/get-started-with-office-365-management-apis#generate-a-new-key-for-your-application)
 
 
+## Initialise Expensify Provider in local machine 
+1. Clone the repository  to $GOPATH/src/github.com/office365/terraform-provider-office365 <br>
+2. Add the partnerUserID and partnerUserSecret generated to respective fields in `main.tf` <br>
+3. Run the following command :
+```golang
+go mod init terraform-provider-expensify
+go mod tidy
+````
+
+```
+
+
 ## Installation
 
 1. Clone this repository

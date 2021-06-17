@@ -17,7 +17,7 @@ type TokenResponse struct {
 }
 
 func GetToken(clientID, clientScret, tenantID string) error {
-	log.Println("Inside getToken")
+	log.Println("geting Token..")
 	url_path := "https://login.microsoftonline.com/" + tenantID + "/oauth2/token"
 	data := url.Values{}
 	data.Set("grant_type", "client_credentials")
@@ -44,5 +44,6 @@ func GetToken(clientID, clientScret, tenantID string) error {
 	}
 	bearer := "Bearer " + respone.AccessToken
 	os.Setenv("bearer", bearer)
+	log.Println("Token aquired")
 	return nil
 }

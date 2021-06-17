@@ -15,14 +15,14 @@ func TestAccItem_Basic(t *testing.T) {
 			{
 				Config: testAccCheckItemBasic(),
 				Check: resource.ComposeTestCheckFunc(
-					resource.TestCheckResourceAttr("office365_user_manage.test_user", "job_title", "intern"),
-					resource.TestCheckResourceAttr("office365_user_manage.test_user", "mail", "testingbasic@clevertap1.onmicrosoft.com"),
-					resource.TestCheckResourceAttr("office365_user_manage.test_user", "mobile_phone", "+91 88216 10 10"),
-					resource.TestCheckResourceAttr("office365_user_manage.test_user", "office_location", "131/1105"),
-					resource.TestCheckResourceAttr("office365_user_manage.test_user", "preferred_language", "en-US"),
-					resource.TestCheckResourceAttr("office365_user_manage.test_user", "surname", "gautam"),
-					resource.TestCheckResourceAttr("office365_user_manage.test_user", "display_name", "Test abc"),
-					resource.TestCheckResourceAttr("office365_user_manage.test_user", "user_principal_name", "testingbasic@clevertap1.onmicrosoft.com"),
+					resource.TestCheckResourceAttr("office365_user.test_user", "job_title", "intern"),
+					resource.TestCheckResourceAttr("office365_user.test_user", "mail", "testingbasic@clevertap1.onmicrosoft.com"),
+					resource.TestCheckResourceAttr("office365_user.test_user", "mobile_phone", "+91 88216 10 10"),
+					resource.TestCheckResourceAttr("office365_user.test_user", "office_location", "131/1105"),
+					resource.TestCheckResourceAttr("office365_user.test_user", "preferred_language", "en-US"),
+					resource.TestCheckResourceAttr("office365_user.test_user", "surname", "gautam"),
+					resource.TestCheckResourceAttr("office365_user.test_user", "display_name", "Test abc"),
+					resource.TestCheckResourceAttr("office365_user.test_user", "user_principal_name", "testingbasic@clevertap1.onmicrosoft.com"),
 				),
 			},
 		},
@@ -31,7 +31,7 @@ func TestAccItem_Basic(t *testing.T) {
 
 func testAccCheckItemBasic() string {
 	return fmt.Sprintf(`
-	resource "office365_user_manage" "test_user" {
+	resource "office365_user" "test_user" {
 		 display_name        = "Test abc"
 		 mail_nick_name = "Tester"
 		 password="testqwerty1@"
@@ -54,27 +54,27 @@ func TestAccItem_Update(t *testing.T) {
 			{
 				Config: testAccCheckItemUpdatePre(),
 				Check: resource.ComposeTestCheckFunc(
-					resource.TestCheckResourceAttr("office365_user_manage.test_user", "job_title", "intern"),
-					resource.TestCheckResourceAttr("office365_user_manage.test_user", "mail", "testingupdate@clevertap1.onmicrosoft.com"),
-					resource.TestCheckResourceAttr("office365_user_manage.test_user", "mobile_phone", "+91 88216 10 10"),
-					resource.TestCheckResourceAttr("office365_user_manage.test_user", "office_location", "131/1105"),
-					resource.TestCheckResourceAttr("office365_user_manage.test_user", "preferred_language", "en-US"),
-					resource.TestCheckResourceAttr("office365_user_manage.test_user", "surname", "gautam"),
-					resource.TestCheckResourceAttr("office365_user_manage.test_user", "display_name", "Test abc"),
-					resource.TestCheckResourceAttr("office365_user_manage.test_user", "user_principal_name", "testingupdate@clevertap1.onmicrosoft.com"),
+					resource.TestCheckResourceAttr("office365_user.test_user", "job_title", "intern"),
+					resource.TestCheckResourceAttr("office365_user.test_user", "mail", "testingupdate@clevertap1.onmicrosoft.com"),
+					resource.TestCheckResourceAttr("office365_user.test_user", "mobile_phone", "+91 88216 10 10"),
+					resource.TestCheckResourceAttr("office365_user.test_user", "office_location", "131/1105"),
+					resource.TestCheckResourceAttr("office365_user.test_user", "preferred_language", "en-US"),
+					resource.TestCheckResourceAttr("office365_user.test_user", "surname", "gautam"),
+					resource.TestCheckResourceAttr("office365_user.test_user", "display_name", "Test abc"),
+					resource.TestCheckResourceAttr("office365_user.test_user", "user_principal_name", "testingupdate@clevertap1.onmicrosoft.com"),
 				),
 			},
 			{
 				Config: testAccCheckItemUpdatePost(),
 				Check: resource.ComposeTestCheckFunc(
-					resource.TestCheckResourceAttr("office365_user_manage.test_user", "job_title", "student"),
-					resource.TestCheckResourceAttr("office365_user_manage.test_user", "mail", "testingupdate@clevertap1.onmicrosoft.com"),
-					resource.TestCheckResourceAttr("office365_user_manage.test_user", "mobile_phone", "+91 88216 20"),
-					resource.TestCheckResourceAttr("office365_user_manage.test_user", "office_location", "131/1105"),
-					resource.TestCheckResourceAttr("office365_user_manage.test_user", "preferred_language", "en-US"),
-					resource.TestCheckResourceAttr("office365_user_manage.test_user", "surname", "gautam"),
-					resource.TestCheckResourceAttr("office365_user_manage.test_user", "display_name", "Test update"),
-					resource.TestCheckResourceAttr("office365_user_manage.test_user", "user_principal_name", "testingupdate@clevertap1.onmicrosoft.com"),
+					resource.TestCheckResourceAttr("office365_user.test_user", "job_title", "student"),
+					resource.TestCheckResourceAttr("office365_user.test_user", "mail", "testingupdate@clevertap1.onmicrosoft.com"),
+					resource.TestCheckResourceAttr("office365_user.test_user", "mobile_phone", "+91 88216 20"),
+					resource.TestCheckResourceAttr("office365_user.test_user", "office_location", "131/1105"),
+					resource.TestCheckResourceAttr("office365_user.test_user", "preferred_language", "en-US"),
+					resource.TestCheckResourceAttr("office365_user.test_user", "surname", "gautam"),
+					resource.TestCheckResourceAttr("office365_user.test_user", "display_name", "Test update"),
+					resource.TestCheckResourceAttr("office365_user.test_user", "user_principal_name", "testingupdate@clevertap1.onmicrosoft.com"),
 				),
 			},
 		},
@@ -84,7 +84,7 @@ func TestAccItem_Update(t *testing.T) {
 func testAccCheckItemUpdatePre() string {
 	return fmt.Sprintf(`
 	
-	resource "office365_user_manage" "test_user" {
+	resource "office365_user" "test_user" {
 		display_name        = "Test abc"
 		mail_nick_name = "Tester"
 		password="testqwerty1123@"
@@ -102,7 +102,7 @@ func testAccCheckItemUpdatePre() string {
 
 func testAccCheckItemUpdatePost() string {
 	return fmt.Sprintf(`
-	resource "office365_user_manage" "test_user" {
+	resource "office365_user" "test_user" {
 		display_name        = "Test update"
 		mail_nick_name = "Tester"
 		password="testqwerty1123@"

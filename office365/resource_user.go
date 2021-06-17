@@ -131,7 +131,8 @@ func resourceUser() *schema.Resource {
 			},
 		},
 		Importer: &schema.ResourceImporter{
-			State: schema.ImportStatePassthrough,
+			// State: schema.ImportStatePassthrough,
+			StateContext: resourceUserImporter,
 		},
 		CreateContext: resourceUserCreate,
 		ReadContext:   resourceUserRead,
@@ -200,11 +201,11 @@ func resourceUserRead(ctx context.Context, d *schema.ResourceData, m interface{}
 	c := m.(*client.Client)
 	UserInfo, err := c.GetUser(d.Id())
 	if err != nil {
+		d.SetId("")
 		log.Println("[ERROR]: ", err)
 		diags = append(diags, diag.Diagnostic{
-			Severity: diag.Error,
-			Summary:  "Unable to get User Information",
-			Detail:   err.Error(),
+			Detail:  err.Error(),
+			Summary: "User does not exist. Create a new User with given details.",
 		})
 		return diags
 	}
@@ -290,4 +291,31 @@ func resourceUserDelete(ctx context.Context, d *schema.ResourceData, m interface
 	}
 	d.SetId("")
 	return diags
+}
+
+func resourceUserImporter(ctx context.Context, d *schema.ResourceData, m interface{}) ([]*schema.ResourceData, error) {
+	//var diags diag.Diagnostics
+	c := m.(*client.Client)
+	UserInfo, err := c.GetUser(d.Id())
+	if err != nil {
+		d.SetId("")
+		// log.Println("[ERROR]: ", err)
+		// diags = append(diags, diag.Diagnostic{
+		// 	Detail:  err.Error(),
+		// 	Summary: "User does not exist. Create a new User with given details.",
+		// })
+		// return diags
+		return nil, err
+	}
+	d.Set("display_name", UserInfo.DisplayName)
+	d.Set("job_title", UserInfo.JobTitle)
+	d.Set("mail", UserInfo.Mail)
+	d.Set("user_principal_name", UserInfo.UserPrincipalName)
+	d.Set("office_location", UserInfo.OfficeLocation)
+	d.Set("mobile_phone", UserInfo.MobilePhone)
+	d.Set("preferred_language", UserInfo.PreferredLanguage)
+	d.Set("surname", UserInfo.Surname)
+	d.Set("object_id", UserInfo.ObjectId)
+	d.Set("given_name", UserInfo.GivenName)
+	return []*schema.ResourceData{d}, nil
 }

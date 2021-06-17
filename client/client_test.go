@@ -10,9 +10,9 @@ import (
 )
 
 func init() {
-	client_id := os.Getenv("CLIENT_ID")
-	client_secret := os.Getenv("CLIENT_SECRET")
-	tenant_id := os.Getenv("TENANT_ID")
+	client_id := os.Getenv("OFFICE365_CLIENT_ID")
+	client_secret := os.Getenv("OFFICE365_CLIENT_SECRET")
+	tenant_id := os.Getenv("OFFICE365_TENANT_ID")
 	err := token.GetToken(client_id, client_secret, tenant_id)
 	if err != nil {
 		log.Fatal(err)
