@@ -6,3 +6,4 @@ credentials.json
 *.exe
 *.tf
 terraform.tfvars
+*.tfvars

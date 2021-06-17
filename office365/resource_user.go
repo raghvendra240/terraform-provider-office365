@@ -131,7 +131,6 @@ func resourceUser() *schema.Resource {
 			},
 		},
 		Importer: &schema.ResourceImporter{
-			// State: schema.ImportStatePassthrough,
 			StateContext: resourceUserImporter,
 		},
 		CreateContext: resourceUserCreate,
@@ -294,17 +293,9 @@ func resourceUserDelete(ctx context.Context, d *schema.ResourceData, m interface
 }
 
 func resourceUserImporter(ctx context.Context, d *schema.ResourceData, m interface{}) ([]*schema.ResourceData, error) {
-	//var diags diag.Diagnostics
 	c := m.(*client.Client)
 	UserInfo, err := c.GetUser(d.Id())
 	if err != nil {
-		d.SetId("")
-		// log.Println("[ERROR]: ", err)
-		// diags = append(diags, diag.Diagnostic{
-		// 	Detail:  err.Error(),
-		// 	Summary: "User does not exist. Create a new User with given details.",
-		// })
-		// return diags
 		return nil, err
 	}
 	d.Set("display_name", UserInfo.DisplayName)
