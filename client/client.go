@@ -125,7 +125,8 @@ func (c *Client) GetUser(UserId string) (*User, error) {
 	if res.StatusCode >= 200 && res.StatusCode <= 299 {
 		return &recieveduser, nil
 	} else {
-		return nil, fmt.Errorf("Error : %v \n Body : %s", Errors[res.StatusCode], body)
+		//return nil, fmt.Errorf("Error : %v \n Body : %s", Errors[res.StatusCode], body)
+		return nil, fmt.Errorf(string(body))
 	}
 }
 
@@ -166,7 +167,8 @@ func (c *Client) CreateUser(userCreateInfo CreatUser) (*User, error) {
 	if res.StatusCode >= 200 && res.StatusCode <= 299 {
 		return &user, nil
 	} else {
-		return nil, fmt.Errorf("Error : %v \n Body : %s", Errors[res.StatusCode], body)
+		// return nil, fmt.Errorf("Error : %v \n Body : %s", Errors[res.StatusCode], body)
+		return nil, fmt.Errorf(string(body))
 	}
 }
 
@@ -198,7 +200,8 @@ func (c *Client) UpdateUser(UserId string, userUpdateInfo UpdateUser) error {
 		return nil
 	} else {
 		log.Printf("Error : %v \n Body : %s", Errors[res.StatusCode], res.Body)
-		return fmt.Errorf("Error : %v \n Body : %s", Errors[res.StatusCode], res.Body)
+		return fmt.Errorf("%s", res.Body)
+		//return nil,fmt.Errorf(string(body))
 	}
 }
 
@@ -221,6 +224,16 @@ func (c *Client) DeleteUser(UserId string) error {
 		return nil
 	} else {
 		log.Println(Errors[res.StatusCode], err)
-		return fmt.Errorf("Error : %v \n Body : %s", Errors[res.StatusCode], res.Body)
+		// return fmt.Errorf("Error : %v \n Body : %s", Errors[res.StatusCode], res.Body)
+		return fmt.Errorf("%s", res.Body)
 	}
+}
+
+func (c *Client) IsRetry(err error) bool {
+	if err != nil {
+		if strings.Contains(err.Error(), "\"responseCode\":429") == true {
+			return true
+		}
+	}
+	return false
 }

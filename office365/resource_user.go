@@ -6,6 +6,8 @@ import (
 	"strings"
 	"terraform-provider-office365/client"
 
+	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/resource"
+
 	val "terraform-provider-office365/validate"
 	"time"
 
@@ -185,39 +187,69 @@ func resourceUserCreate(ctx context.Context, d *schema.ResourceData, m interface
 		Department:        d.Get("department").(string),
 		Mail:              mail,
 	}
-	_, er := c.CreateUser(req_json)
-	if er != nil {
-		log.Println("[ERROR]: ", er)
-		return diag.FromErr(er)
+	var errr error
+	retryErr := resource.Retry(2*time.Minute, func() *resource.RetryError {
+		_, err := c.CreateUser(req_json)
+		errr = err
+		if err != nil {
+			if c.IsRetry(err) {
+				return resource.RetryableError(err)
+			}
+			return resource.NonRetryableError(err)
+		}
+		return nil
+	})
+	if retryErr != nil {
+		time.Sleep(2 * time.Second)
+		return diag.FromErr(retryErr)
+	}
+	if errr != nil {
+		log.Println("[ERROR]: ", errr)
+		return diag.FromErr(errr)
 	}
 	d.SetId(Id)
-	resourceUserRead(ctx, d, m)
 	return diags
 }
 
 func resourceUserRead(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
 	var diags diag.Diagnostics
 	c := m.(*client.Client)
-	UserInfo, err := c.GetUser(d.Id())
-	if err != nil {
+	var errr error
+	retryErr := resource.Retry(2*time.Minute, func() *resource.RetryError {
+		UserInfo, err := c.GetUser(d.Id())
+		errr = err
+		if err != nil {
+			if c.IsRetry(err) {
+				return resource.RetryableError(err)
+			}
+			return resource.NonRetryableError(err)
+		}
+		d.Set("display_name", UserInfo.DisplayName)
+		d.Set("job_title", UserInfo.JobTitle)
+		d.Set("mail", UserInfo.Mail)
+		d.Set("user_principal_name", UserInfo.UserPrincipalName)
+		d.Set("office_location", UserInfo.OfficeLocation)
+		d.Set("mobile_phone", UserInfo.MobilePhone)
+		d.Set("preferred_language", UserInfo.PreferredLanguage)
+		d.Set("surname", UserInfo.Surname)
+		d.Set("object_id", UserInfo.ObjectId)
+		d.Set("given_name", UserInfo.GivenName)
+		return nil
+	})
+
+	if retryErr != nil {
+		time.Sleep(2 * time.Second)
+		return diag.FromErr(retryErr)
+	}
+	if errr != nil {
 		d.SetId("")
-		log.Println("[ERROR]: ", err)
+		log.Println("[ERROR]: ", retryErr)
 		diags = append(diags, diag.Diagnostic{
-			Detail:  err.Error(),
+			Detail:  errr.Error(),
 			Summary: "User does not exist. Create a new User with given details.",
 		})
 		return diags
 	}
-	d.Set("display_name", UserInfo.DisplayName)
-	d.Set("job_title", UserInfo.JobTitle)
-	d.Set("mail", UserInfo.Mail)
-	d.Set("user_principal_name", UserInfo.UserPrincipalName)
-	d.Set("office_location", UserInfo.OfficeLocation)
-	d.Set("mobile_phone", UserInfo.MobilePhone)
-	d.Set("preferred_language", UserInfo.PreferredLanguage)
-	d.Set("surname", UserInfo.Surname)
-	d.Set("object_id", UserInfo.ObjectId)
-	d.Set("given_name", UserInfo.GivenName)
 	return diags
 }
 
@@ -260,13 +292,27 @@ func resourceUserUpdate(ctx context.Context, d *schema.ResourceData, m interface
 		Country:           d.Get("country").(string),
 		State:             d.Get("state").(string),
 	}
-	errr := c.UpdateUser(d.Id(), req_json)
-	if errr != nil {
-		log.Println("[ERROR]: ", errr)
+	var err error
+	retryErr := resource.Retry(2*time.Minute, func() *resource.RetryError {
+		err = c.UpdateUser(d.Id(), req_json)
+		if err != nil {
+			if c.IsRetry(err) {
+				return resource.RetryableError(err)
+			}
+			return resource.NonRetryableError(err)
+		}
+		return nil
+	})
+	if retryErr != nil {
+		time.Sleep(2 * time.Second)
+		return diag.FromErr(retryErr)
+	}
+	if err != nil {
+		log.Println("[ERROR]: ", err)
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
 			Summary:  "!Update failed",
-			Detail:   errr.Error(),
+			Detail:   err.Error(),
 		})
 		return diags
 	}
@@ -278,7 +324,22 @@ func resourceUserDelete(ctx context.Context, d *schema.ResourceData, m interface
 	var diags diag.Diagnostics
 	c := m.(*client.Client)
 	UserID := d.Id()
-	err := c.DeleteUser(UserID)
+	var err error
+	retryErr := resource.Retry(2*time.Minute, func() *resource.RetryError {
+		err := c.DeleteUser(UserID)
+		if err != nil {
+			if c.IsRetry(err) {
+				return resource.RetryableError(err)
+			}
+			return resource.NonRetryableError(err)
+		}
+		return nil
+	})
+
+	if retryErr != nil {
+		time.Sleep(2 * time.Second)
+		return diag.FromErr(retryErr)
+	}
 	if err != nil {
 		log.Println("[ERROR]: ", err)
 		diags = append(diags, diag.Diagnostic{
