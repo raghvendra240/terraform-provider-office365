@@ -32,6 +32,6 @@ This folder contains two files client.go and client_test.go
 1. Open client folder in terminal 
 2. Run  
   ```
-  CLIENT_ID=<clientID> CLIENT_SECRET=<clientSceret> TENANT_ID=<tenanatID> go test -v
+  OFFICE365_CLIENT_ID=<clientID> OFFICE365_CLIENT_SECRET=<clientSceret> OFFICE365_TENANT_ID=<tenanatID> go test -v
   ```
 3. To check coverage run go test -cover

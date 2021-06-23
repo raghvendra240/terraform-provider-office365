@@ -13,9 +13,12 @@ terraform office365 provider is based on Terraform, this means that you need
 
 #### Setup
 
-1. Create office365 developer account by following [this](https://docs.microsoft.com/en-us/office/developer-program/microsoft-365-developer-program)
-2. Set up a Microsoft 365 developer sandbox subscription by following [this](https://docs.microsoft.com/en-us/office/developer-program/microsoft-365-developer-program-get-started)
-3. Register your application in Azure AD by following [this](https://docs.microsoft.com/en-us/office/office-365-management-api/get-started-with-office-365-management-apis#register-your-application-in-azure-ad)
+1. Create Mirosoft office365 account
+1. Go to the Join the [Microsoft 365 Developer Program](https://developer.microsoft.com/en-us/microsoft-365/dev-program) page and join the developer Program
+2. Set up a [Microsoft 365 developer sandbox subscription](https://docs.microsoft.com/en-us/office/developer-program/microsoft-365-developer-program-get-started)
+3. Register your application in AzureAd
+   - Use the Azure Management Portal to register your application in Azure AD
+   - For reference documentation click [here](https://docs.microsoft.com/en-us/office/office-365-management-api/get-started-with-office-365-management-apis#prerequisites)
 
 #### API Authentication
 1. To authenticate API, we need these credentials: ObjectID ,TenantID and ClientSecret.
