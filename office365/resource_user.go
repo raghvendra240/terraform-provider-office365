@@ -159,10 +159,6 @@ func resourceUserCreate(ctx context.Context, d *schema.ResourceData, m interface
 	if mailNickName == "" {
 		mailNickName = strings.Split(Id, "@")[0]
 	}
-	mail := d.Get("mail").(string)
-	if mail == "" {
-		mail = d.Get("user_principal_name").(string)
-	}
 	req_json := client.CreatUser{
 		AccountEnabled:    d.Get("account_enabled").(bool),
 		DisplayName:       d.Get("display_name").(string),
@@ -185,11 +181,14 @@ func resourceUserCreate(ctx context.Context, d *schema.ResourceData, m interface
 		City:              d.Get("city").(string),
 		Country:           d.Get("country").(string),
 		Department:        d.Get("department").(string),
-		Mail:              mail,
+		Mail:              d.Get("mail").(string),
 	}
 	var errr error
 	retryErr := resource.Retry(2*time.Minute, func() *resource.RetryError {
 		_, err := c.CreateUser(req_json)
+		if err != nil {
+			log.Println(err.Error())
+		}
 		errr = err
 		if err != nil {
 			if c.IsRetry(err) {
@@ -214,10 +213,8 @@ func resourceUserCreate(ctx context.Context, d *schema.ResourceData, m interface
 func resourceUserRead(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
 	var diags diag.Diagnostics
 	c := m.(*client.Client)
-	//var errr error
 	retryErr := resource.Retry(2*time.Minute, func() *resource.RetryError {
 		UserInfo, err := c.GetUser(d.Id())
-
 		if err != nil {
 			if c.IsRetry(err) {
 				return resource.RetryableError(err)
@@ -236,7 +233,6 @@ func resourceUserRead(ctx context.Context, d *schema.ResourceData, m interface{}
 		d.Set("given_name", UserInfo.GivenName)
 		return nil
 	})
-
 	if retryErr != nil {
 		if strings.Contains(retryErr.Error(), "does not exist") == true {
 			d.SetId("")
@@ -244,19 +240,6 @@ func resourceUserRead(ctx context.Context, d *schema.ResourceData, m interface{}
 		}
 		return diag.FromErr(retryErr)
 	}
-	// if retryErr != nil {
-	// 	time.Sleep(2 * time.Second)
-	// 	return diag.FromErr(retryErr)
-	// }
-	// if errr != nil {
-	// 	d.SetId("")
-	// 	log.Println("[ERROR]: ", retryErr)
-	// 	diags = append(diags, diag.Diagnostic{
-	// 		Detail:  errr.Error(),
-	// 		Summary: "User does not exist. Create a new User with given details.",
-	// 	})
-	// 	return diags
-	// }
 	return diags
 }
 
@@ -324,7 +307,7 @@ func resourceUserUpdate(ctx context.Context, d *schema.ResourceData, m interface
 		return diags
 	}
 	d.Set("last_updated", time.Now().Format(time.RFC850))
-	return resourceUserRead(ctx, d, m)
+	return diags
 }
 
 func resourceUserDelete(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {

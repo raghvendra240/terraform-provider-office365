@@ -54,7 +54,7 @@ type UpdateUser struct {
 	AccountEnabled    bool   `json:"accountEnabled"`
 	DisplayName       string `json:"displayName,omitempty"`
 	MailNickName      string `json:"mailNickname,omitempty"`
-	GivenName         string `json:"givenName"`
+	GivenName         string `json:"givenName,omitempty"`
 	JobTitle          string `json:"jobTitle,omitempty"`
 	Mail              string `json:"mail,omitempty"`
 	MobilePhone       string `json:"mobilePhone,omitempty"`
@@ -197,8 +197,8 @@ func (c *Client) UpdateUser(UserId string, userUpdateInfo UpdateUser) error {
 	if res.StatusCode >= 200 && res.StatusCode <= 299 {
 		return nil
 	} else {
-		log.Printf("Error : %v \n Body : %s", Errors[res.StatusCode], res.Body)
-		return fmt.Errorf("%s", res.Body)
+		log.Printf("Error my : %v \n Body : %s", Errors[res.StatusCode], res.Body)
+		return fmt.Errorf("%v \nbody: %s", Errors[res.StatusCode], res.Body)
 	}
 }
 

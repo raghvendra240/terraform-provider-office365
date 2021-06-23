@@ -1,73 +1,86 @@
-# Terraform provider for office365
-
-This provider allows to perform Create ,Read ,Update ,Delete ,activate , deactivate and Import user of office365
+This Terraform provider enables create, read, update, delete, and import operations for Microspft office365 users.
 
 ## Requirements
 
 terraform office365 provider is based on Terraform, this means that you need
 
-1. [Go](https://golang.org/doc/install) 1.11 or later
-2. [Terraform](https://www.terraform.io/downloads.html) v0.13.0 or later
-3. [office365 Developer account](https://developer.microsoft.com/en-us/microsoft-365/dev-program)
+- Go >= 1.16 (To build the provider plugin)
+- Terraform >= 0.13.x
+- Application  [Micorsft office365](https://www.office.com/)
+- [Office365 API documentation](https://docs.microsoft.com/en-us/graph/overview)
 
+## Application account
 
-## Setup office365 account
+#### Setup
 
 1. Create office365 developer account by following [this](https://docs.microsoft.com/en-us/office/developer-program/microsoft-365-developer-program)
 2. Set up a Microsoft 365 developer sandbox subscription by following [this](https://docs.microsoft.com/en-us/office/developer-program/microsoft-365-developer-program-get-started)
 3. Register your application in Azure AD by following [this](https://docs.microsoft.com/en-us/office/office-365-management-api/get-started-with-office-365-management-apis#register-your-application-in-azure-ad)
-4. Generate a new key for your application by following [this](https://docs.microsoft.com/en-us/office/office-365-management-api/get-started-with-office-365-management-apis#generate-a-new-key-for-your-application)
+
+#### API Authentication
+1. To authenticate API, we need these credentials: ObjectID ,TenantID and ClientSecret.
+2.  Generate a new key for your application by following [this](https://docs.microsoft.com/en-us/office/office-365-management-api/get-started-with-office-365-management-apis#generate-a-new-key-for-your-application)
 
 
-## Initialise Expensify Provider in local machine 
-1. Clone the repository  to $GOPATH/src/github.com/office365/terraform-provider-office365 <br>
-2. Add the partnerUserID and partnerUserSecret generated to respective fields in `main.tf` <br>
-3. Run the following command :
-```golang
-go mod init terraform-provider-expensify
+## Building The Provider 
+1. Clone the repository, add all the dependencies and create a vendor directory that contains all dependencies. For this, run the following commands: <br>
+```
+cd terraform-provider-office365
+go mod init terraform-provider-office365
 go mod tidy
-````
-
+go mod vendor
 ```
 
-
-## Installation
-
-1. Clone this repository
-2. Run the following command to create a vendor subdirectory which will comprise of all provider dependencies.
-     ```mkdir -p %APPDATA%//.terraform.d/plugins/${host_name}/${namespace}/${type}/${version}/[architecture name]/```
-     you can find full list of architecture names [here](https://golang.org/doc/install/source#environment)
-    for example:
-    ```
-    mkdir -p %APPDATA%/terraform.d/plugins/raghvnedra/clvertap/office365/0.1/windows_amd64
-    ```
-2. Run ``` go build -o terraform-provider-office365.exe ``` This will save the binary (.exe) file in the main/root directory.
-3. Run this command to move this binary file to appropriate location.
+## Managing terraform plugins
+*For Windows:*
+1. Run the following command to create a vendor sub-directory (`%APPDATA%/terraform.d/plugins/${host_name}/${namespace}/${type}/${version}/${OS_ARCH}`) which will consist of all terraform plugins. <br> 
+Command: 
+```bash
+mkdir -p %APPDATA%/terraform.d/plugins/office365.com/users/office365/1.0.0/windows_amd64
 ```
-move terraform-provider-office365.exe %APPDATA%\terraform.d\plugins\raghvendra\clevertap\office365\0.1\[OS_ARCH]
+2. Run `go build -o terraform-provider-office365.exe` to generate the binary in present working directory. <br>
+3. Run this command to move this binary file to the appropriate location.
+ ```
+ move terraform-provider-office365.exe %APPDATA%\terraform.d\plugins\office356.com\users\office365\1.0.0\windows_amd64
+ ``` 
+<p align="center">[OR]</p>
+ 
+3. Manually move the file from current directory to destination directory (`%APPDATA%\terraform.d\plugins\office365.com\users\office365\1.0.0\windows_amd64`).<br>
+
+## Working with terraform
+
+### Application Credential Integration in terraform
+1. Add `terraform` block and `provider` block as shown in [example usage](#example-usage).
+2. Get credentials: ObjectID ,TenantID and ClientSecret. For this, visit https://docs.microsoft.com/en-us/azure/active-directory/develop/quickstart-register-app#add-credentials
+3. Assign the above credentials to the respective field in the `provider` block.
+
+### Basic Terraform Commands
+1. `terraform init` - To initialize a working directory containing Terraform configuration files.
+2. `terraform plan` - To create an execution plan. Displays the changes to be done.
+3. `terraform apply` - To execute the actions proposed in a Terraform plan. Apply the changes.
+
+### Create User
+1. Add the `display_name`, `password`, `mail_nick_name`, `user_principal_name`,  in the respective field in `resource` block as shown in [example usage](#example-usage).
+2. Run the basic terraform commands.<br>
+3. On successful execution, Created new office365 user
+
+### Update the user
+1. Update the data of the user in the `resource` block as show in [example usage](#example-usage) and run the basic terraform commands to update user. 
+   User is not allowed to update `password` and `user_principal_name`.
+
+### Read the User Data
+Add `data` and `output` blocks as shown in the [example usage](#example-usage) and run the basic terraform commands.
+
+### Delete the user
+Delete the `resource` block of the user and run `terraform apply`.
+
+### Import a User Data
+1. Write manually a `resource` configuration block for the user as shown in [example usage](#example-usage). Imported user will be mapped to this block.
+2. Run the command `terraform import office365_user.exmaple  [user_principal_name]` to import user.
+3. Run `terraform plan`, if output shows `0 to addd, 0 to change and 0 to destroy` user import is successful.
+
+## Example Usage<a id="example-usage"></a>
 ```
-5. Otherwise you can manually move the file from current directory to destination directory.
-
-
-
-## Comands to Run the Provider
-
-1. terraform init
-2. terraform plan
-3. terrafrom apply (To create or update the user)
-4. terraform destroy (To destroy the created user)
-
-## Steps to run import command
-
-1. Write manually a resource configuration block for the resource, to which the imported object will be mapped.
-
-2. RUN `` terraform import office365_user_manage.<block_name> <userPrincipalName> ``
-
-3. Check for the attributes in the .tfstate file and fill them accordingly in resource block.
-
-### Usage Example
-```
-# This is required for Terraform 0.13+
 terraform {
   required_providers {
     office365 = {
@@ -77,27 +90,21 @@ terraform {
   }
 }
 
-# configure provider
 provider "office365" {
-   client_id     = "---"
-   client_secret = "---"
-   tenant_id     ="---"
-  
-  #Above parameters are required to access the developer account
+   client_id     = "_Replace_office365_Client_ID_"
+   client_secret = "_Replace_office365_Client_Secret_"
+   tenant_id     ="_Replace_office365_Tenant_ID_"
+
 }
 
 #Creating User
 resource "office365_user_manage" "example" {
-   display_name        ="---"
+   display_name        ="user full name"
+   mail_nick_name      ="nick name"
    user_principal_name ="example@<officce365domain>.onmicrosoft.com"
-   password            ="---"
-   account_enabled     ="---"
+   password            ="*******"
+   account_enabled     ="true/false"
 }
-
-#Updaing User
- - To update any parameter just  change them in the respective resouce block and run terraform apply
- - passowrd and user_principal_name can not be changed.
- - To activate or deactivate user, set true/false to account_enabled accordingly.
 
 
 #Get user Information
@@ -110,7 +117,7 @@ data "office365_users" "example" {
 
 ```
 
-### Supported Arguments in resource block
+### Argument Reference
 - ``display_name`` (required) The name displayed in the address book for the user. This is usually the combination of the user's first name, middle initial and last name.<br/>
 
 - ``user_principal_name`` (required)The user principal name (UPN) of the user. The UPN is an Internet-style login name for the user based on the Internet standard RFC 822. By convention, this should map to the user's email name. The general format is alias@domain, where domain must be present in the tenant's collection of verified domains. This property is required when a user is created. 

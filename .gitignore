@@ -5,6 +5,14 @@ vendor/
 credentials.json
 *.exe
 *.tf
-terraform.tfvars
-*.tfvars
+
+*.iml
+*.terraform*
+*.terraform/
+planfile*
+*tfstate*
+*.tfplan*
+*backend.config
+errored.tfstate
+*.idea
 Makefile
