@@ -16,7 +16,6 @@ func TestAccItem_Basic(t *testing.T) {
 				Config: testAccCheckItemBasic(),
 				Check: resource.ComposeTestCheckFunc(
 					resource.TestCheckResourceAttr("office365_user.test_user", "job_title", "intern"),
-					resource.TestCheckResourceAttr("office365_user.test_user", "mail", "testingbasic@clevertap1.onmicrosoft.com"),
 					resource.TestCheckResourceAttr("office365_user.test_user", "mobile_phone", "+91 88216 10 10"),
 					resource.TestCheckResourceAttr("office365_user.test_user", "office_location", "131/1105"),
 					resource.TestCheckResourceAttr("office365_user.test_user", "preferred_language", "en-US"),
@@ -55,7 +54,6 @@ func TestAccItem_Update(t *testing.T) {
 				Config: testAccCheckItemUpdatePre(),
 				Check: resource.ComposeTestCheckFunc(
 					resource.TestCheckResourceAttr("office365_user.test_user", "job_title", "intern"),
-					resource.TestCheckResourceAttr("office365_user.test_user", "mail", "testingupdate@clevertap1.onmicrosoft.com"),
 					resource.TestCheckResourceAttr("office365_user.test_user", "mobile_phone", "+91 88216 10 10"),
 					resource.TestCheckResourceAttr("office365_user.test_user", "office_location", "131/1105"),
 					resource.TestCheckResourceAttr("office365_user.test_user", "preferred_language", "en-US"),
@@ -68,7 +66,6 @@ func TestAccItem_Update(t *testing.T) {
 				Config: testAccCheckItemUpdatePost(),
 				Check: resource.ComposeTestCheckFunc(
 					resource.TestCheckResourceAttr("office365_user.test_user", "job_title", "student"),
-					resource.TestCheckResourceAttr("office365_user.test_user", "mail", "testingupdate@clevertap1.onmicrosoft.com"),
 					resource.TestCheckResourceAttr("office365_user.test_user", "mobile_phone", "+91 88216 20"),
 					resource.TestCheckResourceAttr("office365_user.test_user", "office_location", "131/1105"),
 					resource.TestCheckResourceAttr("office365_user.test_user", "preferred_language", "en-US"),
