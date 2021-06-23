@@ -2,11 +2,9 @@ This Terraform provider enables create, read, update, delete, and import operati
 
 ## Requirements
 
-terraform office365 provider is based on Terraform, this means that you need
-
-- Go >= 1.16 (To build the provider plugin)
-- Terraform >= 0.13.x
-- Application  [Micorsft office365](https://www.office.com/)
+- [Go](https://golang.org/doc/install) >= 1.16 (To build the provider plugin)
+- [Terraform](https://www.terraform.io/downloads.html) >= 0.13.x
+- Application : [Micorsft office365](https://www.office.com/)
 - [Office365 API documentation](https://docs.microsoft.com/en-us/graph/overview)
 
 ## Application account
@@ -69,7 +67,8 @@ mkdir -p %APPDATA%/terraform.d/plugins/office365.com/users/office365/1.0.0/windo
 
 ### Update the user
 1. Update the data of the user in the `resource` block as show in [example usage](#example-usage) and run the basic terraform commands to update user. 
-   User is not allowed to update `password` and `user_principal_name`.
+3. User is not allowed to update `password` and `user_principal_name`.
+2. To activate user, set account_enabled=true and vice-versa
 
 ### Read the User Data
 Add `data` and `output` blocks as shown in the [example usage](#example-usage) and run the basic terraform commands.
@@ -106,7 +105,7 @@ resource "office365_user_manage" "example" {
    mail_nick_name      ="nick name"
    user_principal_name ="example@<officce365domain>.onmicrosoft.com"
    password            ="*******"
-   account_enabled     ="true/false"
+   account_enabled     ="true"
 }
 
 
@@ -126,14 +125,15 @@ data "office365_users" "example" {
 - ``user_principal_name`` (required)The user principal name (UPN) of the user. The UPN is an Internet-style login name for the user based on the Internet standard RFC 822. By convention, this should map to the user's email name. The general format is alias@domain, where domain must be present in the tenant's collection of verified domains. This property is required when a user is created. 
 
 - ``password`` (required) password for created user.<br/>
+- ``force_change_password_nextsignin`` (required) It will force to change the password when user singin for first time.
 
-- ``account_enable`` (optional) Takes only true/false as input and allow us to activate/deactivate account(Default:true).
+- ``account_enabled`` (optional) Takes only true/false as input and allow us to activate/deactivate account(Default:true).
 
 - ``given_name`` (optional) first name of user.
 
 - ``surname`` (optional) second name of user.
 
-- ``Job-title`` (optional) The user's job title. Maximum length is 128 characters.
+- ``jobtitle`` (optional) The user's job title. Maximum length is 128 characters.
 
 - ``office_location``(optional) office location of user.
 
