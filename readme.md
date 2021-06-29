@@ -142,8 +142,8 @@ data "office365_users" "example" {
 - ``mobile_phone`` (optional,String) The primary cellular telephone number for the user.
 - ``postal_code`` (optional,String)The postal code for the user's postal address. The postal code is specific to the user's country/region.
 
-- ``state`` (optional,String,String)The state or province in the user's address.
+- ``state`` (optional,String)The state or province in the user's address.
 - ``preferred_language`` (optional,String)The preferred language for the user. Should follow ISO 639-1 Code; for example "en-US".
-- ``street_address`` (optional)The street address of the user's place of business.
+- ``street_address`` (optional,String)The street address of the user's place of business.
 - ``usage_location`` (optional,String)A two letter country code (ISO standard 3166). Required for users that will be assigned licenses due to legal requirement to check for availability of services in countries. Examples include: "US", "JP", and "GB".
 
