@@ -120,30 +120,30 @@ data "office365_users" "example" {
 ```
 
 ### Argument Reference
-- ``display_name`` (required) The name displayed in the address book for the user. This is usually the combination of the user's first name, middle initial and last name.<br/>
+- ``display_name`` (required,String) The name displayed in the address book for the user. This is usually the combination of the user's first name, middle initial and last name.<br/>
 
-- ``user_principal_name`` (required)The user principal name (UPN) of the user. The UPN is an Internet-style login name for the user based on the Internet standard RFC 822. By convention, this should map to the user's email name. The general format is alias@domain, where domain must be present in the tenant's collection of verified domains. This property is required when a user is created. 
+- ``user_principal_name`` (required,String)The user principal name (UPN) of the user. The UPN is an Internet-style login name for the user based on the Internet standard RFC 822. By convention, this should map to the user's email name. The general format is alias@domain, where domain must be present in the tenant's collection of verified domains. This property is required when a user is created. 
 
-- ``password`` (required) password for created user.<br/>
-- ``force_change_password_nextsignin`` (required) It will force to change the password when user singin for first time.
+- ``password`` (required,String) password for created user.<br/>
+- ``force_change_password_nextsignin`` (required,Boolean) It will force to change the password when user singin for first time.
 
-- ``account_enabled`` (optional) Takes only true/false as input and allow us to activate/deactivate account(Default:true).
+- ``account_enabled`` (optional,Boolean) Takes only true/false as input and allow us to activate/deactivate account(Default:true).
 
-- ``given_name`` (optional) first name of user.
+- ``given_name`` (optional,String) first name of user.
 
-- ``surname`` (optional) second name of user.
+- ``surname`` (optional,String) second name of user.
 
-- ``jobtitle`` (optional) The user's job title. Maximum length is 128 characters.
+- ``jobtitle`` (optional,String) The user's job title. Maximum length is 128 characters.
 
-- ``office_location``(optional) office location of user.
+- ``office_location``(optional,String) office location of user.
 
-- ``mail_nick_name`` (optional) The mail alias for the user.
+- ``mail_nick_name`` (optional,String) The mail alias for the user.
 
-- ``mobile_phone`` (optional) The primary cellular telephone number for the user.
-- ``postal_code`` (optional)The postal code for the user's postal address. The postal code is specific to the user's country/region.
+- ``mobile_phone`` (optional,String) The primary cellular telephone number for the user.
+- ``postal_code`` (optional,String)The postal code for the user's postal address. The postal code is specific to the user's country/region.
 
-- ``state`` (optional)The state or province in the user's address.
-- ``preferred_language`` (optional)The preferred language for the user. Should follow ISO 639-1 Code; for example "en-US".
+- ``state`` (optional,String,String)The state or province in the user's address.
+- ``preferred_language`` (optional,String)The preferred language for the user. Should follow ISO 639-1 Code; for example "en-US".
 - ``street_address`` (optional)The street address of the user's place of business.
-- ``usage_location`` (optional)A two letter country code (ISO standard 3166). Required for users that will be assigned licenses due to legal requirement to check for availability of services in countries. Examples include: "US", "JP", and "GB".
+- ``usage_location`` (optional,String)A two letter country code (ISO standard 3166). Required for users that will be assigned licenses due to legal requirement to check for availability of services in countries. Examples include: "US", "JP", and "GB".
 
