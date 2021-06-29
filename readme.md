@@ -149,6 +149,6 @@ data "office365_users" "example" {
 
 
 ### Exceptions
-- In import, only specific arguments are read by API. so any arguments other then these , we have to enter them manually.
+- In import, only specific arguments are read by API. so to manage any arguments other than these, we have to enter manually.
 
 -  Refere [this](https://docs.microsoft.com/en-us/graph/api/user-get?view=graph-rest-1.0&tabs=http#response-1) for arguments list.
