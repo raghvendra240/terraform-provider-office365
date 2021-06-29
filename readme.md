@@ -148,7 +148,7 @@ data "office365_users" "example" {
 - ``usage_location`` (optional,String)A two letter country code (ISO standard 3166). Required for users that will be assigned licenses due to legal requirement to check for availability of services in countries. Examples include: "US", "JP", and "GB".
 
 
-###Exceptions
+### Exceptions
 - In import, only specific arguments are read by API. so any arguments other then these , we have to enter them manually.
 
 -  Refere [this](https://docs.microsoft.com/en-us/graph/api/user-get?view=graph-rest-1.0&tabs=http#response-1) for arguments list.
