@@ -60,7 +60,7 @@ func dataSourceUsers() *schema.Resource {
 }
 
 func dataSourceUserRead(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
-	log.Println("DataSOurce Read called")
+	log.Println("DataSource Read called")
 	c := m.(*client.Client)
 	var diags diag.Diagnostics
 	userName := d.Get("userprincipalname").(string)

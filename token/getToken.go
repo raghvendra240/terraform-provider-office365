@@ -25,10 +25,16 @@ func GetToken(clientID, clientScret, tenantID string) error {
 	data.Set("client_secret", clientScret)
 	data.Set("resource", "https://graph.microsoft.com")
 	encodedData := data.Encode()
-	req, _ := http.NewRequest("POST", url_path, strings.NewReader(encodedData))
+	req, err := http.NewRequest("POST", url_path, strings.NewReader(encodedData))
+	if err != nil {
+		return err
+	}
 	req.Header.Add("Content-Type", "application/x-www-form-urlencoded")
 	req.Header.Add("Content-Length", strconv.Itoa(len(data.Encode())))
-	res, _ := http.DefaultClient.Do(req)
+	res, err := http.DefaultClient.Do(req)
+	if err != nil {
+		return err
+	}
 	defer res.Body.Close()
 	if res.StatusCode != 200 {
 		return fmt.Errorf("something is wrong as status code is %d", res.StatusCode)

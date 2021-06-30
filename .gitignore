@@ -16,3 +16,4 @@ planfile*
 errored.tfstate
 *.idea
 Makefile
+*txt
