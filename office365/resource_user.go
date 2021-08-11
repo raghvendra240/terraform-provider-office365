@@ -131,6 +131,24 @@ func resourceUser() *schema.Resource {
 				Optional: true,
 				Computed: true,
 			},
+			"disabled_plans": {
+				Type: schema.TypeSet,
+				Elem: &schema.Schema{
+					Type: schema.TypeString,
+				},
+				Optional: true,
+			},
+			"remove_licenses": {
+				Type: schema.TypeSet,
+				Elem: &schema.Schema{
+					Type: schema.TypeString,
+				},
+				Optional: true,
+			},
+			"skuid": &schema.Schema{
+				Type:     schema.TypeString,
+				Optional: true,
+			},
 		},
 		Importer: &schema.ResourceImporter{
 			StateContext: resourceUserImporter,
@@ -206,8 +224,46 @@ func resourceUserCreate(ctx context.Context, d *schema.ResourceData, m interface
 		log.Println("[ERROR]: ", errr)
 		return diag.FromErr(errr)
 	}
+	if d.Get("skuid") != "" {
+		err := assignLicense(ctx, d, m)
+		if err != nil {
+			c.DeleteUser(Id)
+			return diag.FromErr(err)
+		}
+	}
 	d.SetId(Id)
 	return diags
+}
+
+func assignLicense(ctx context.Context, d *schema.ResourceData, m interface{}) error {
+	tfDisablePlanes := d.Get("disabled_plans").(*schema.Set).List()
+	disabledPlanesData := make([]string, len(tfDisablePlanes))
+	for i, data := range tfDisablePlanes {
+		disabledPlanesData[i] = data.(string)
+	}
+	tfRemoveLicense := d.Get("remove_licenses").(*schema.Set).List()
+	removeLicenseData := make([]string, len(tfRemoveLicense))
+	for i, data := range tfRemoveLicense {
+		removeLicenseData[i] = data.(string)
+	}
+	assigned_json := client.AssignedLicenses{
+		DisabledPlans: disabledPlanesData,
+		Skid:          d.Get("skuid").(string),
+	}
+	assArray := make([]client.AssignedLicenses, 1)
+	assArray[0] = assigned_json
+	main_license := client.License{
+		AddLicenses:    assArray,
+		RemoveLicenses: removeLicenseData,
+	}
+	c := m.(*client.Client)
+	Id := d.Get("user_principal_name").(string)
+	err := c.CreateLicense(Id, main_license)
+	if err != nil {
+		return err
+	}
+	return nil
+
 }
 
 func resourceUserRead(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
@@ -239,6 +295,13 @@ func resourceUserRead(ctx context.Context, d *schema.ResourceData, m interface{}
 			return diags
 		}
 		return diag.FromErr(retryErr)
+	}
+	if d.Get("skuid") != "" {
+		err := assignLicense(ctx, d, m)
+		if err != nil {
+			c.DeleteUser(d.Id())
+
+		}
 	}
 	return diags
 }

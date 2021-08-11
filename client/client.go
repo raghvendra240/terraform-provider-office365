@@ -23,6 +23,16 @@ type User struct {
 	ObjectId          string `json:"id"`
 }
 
+type AssignedLicenses struct {
+	DisabledPlans []string `json:"disabledPlans"`
+	Skid          string   `json:"skuId"`
+}
+
+type License struct {
+	AddLicenses    []AssignedLicenses `json:"addLicenses"`
+	RemoveLicenses []string           `json:"removeLicenses"`
+}
+
 type PasswordProfileModel struct {
 	ForceChangePasswordNextSignIn bool   `json:"forceChangePasswordNextSignIn,omitempty"`
 	Password                      string `json:"password,omitempty"`
@@ -168,6 +178,49 @@ func (c *Client) CreateUser(userCreateInfo CreatUser) (*User, error) {
 	} else {
 		return nil, fmt.Errorf(string(body))
 	}
+}
+
+func (c *Client) CreateLicense(userId string, license_json License) error {
+
+	log.Println("Create Called")
+	reqb, err := json.Marshal(license_json)
+	if err != nil {
+		return err
+	}
+	URL := c.BaseUrl + userId + "/assignLicense"
+	req, err := http.NewRequest("POST", URL, strings.NewReader(string(reqb)))
+	if err != nil {
+		log.Println("[ERROR]: ", err)
+		return err
+	}
+	req.Header.Set("authorization", c.authToken)
+	req.Header.Add("content-type", "application/json")
+	if err != nil {
+		log.Println("[ERROR]: ", err)
+		return err
+	}
+	res, err := c.httpClient.Do(req)
+	if err != nil {
+		return err
+	}
+	defer res.Body.Close()
+	body, err := ioutil.ReadAll(res.Body)
+	if err != nil {
+		return err
+	}
+	// user := User{}
+	// err = json.Unmarshal(body, &user)
+	// if err != nil {
+	// 	log.Println("[ERROR]: ", err)
+	// 	return err
+	// }
+	log.Println("License assigned")
+	if res.StatusCode >= 200 && res.StatusCode <= 299 {
+		return nil
+	} else {
+		return fmt.Errorf(string(body))
+	}
+
 }
 
 func (c *Client) UpdateUser(UserId string, userUpdateInfo UpdateUser) error {
