@@ -25,18 +25,7 @@ func resourceLicense() *schema.Resource {
 				},
 				Optional: true,
 			},
-			// "remove_licenses": {
-			// 	Type: schema.TypeSet,
-			// 	Elem: &schema.Schema{
-			// 		Type: schema.TypeString,
-			// 	},
-			// 	Optional: true,
-			// },
-			// "skuid": &schema.Schema{
-			// 	Type:     schema.TypeSet,
-			// 	Optional: true,
-			//},
-			"license_details": {
+			"license details": {
 				Type: schema.TypeMap,
 				Elem: &schema.Schema{
 					Type: schema.TypeSet,
@@ -51,8 +40,6 @@ func resourceLicense() *schema.Resource {
 			StateContext: resourceUserImporter,
 		},
 		CreateContext: resourceLicenseCreate,
-		ReadContext:   resourceLicenseRead,
-		UpdateContext: resourceLicenseUpdate,
 		DeleteContext: resourceLicenseDelete,
 	}
 }
@@ -69,9 +56,6 @@ func resourceLicenseCreate(ctx context.Context, d *schema.ResourceData, m interf
 	for i, data := range tfDisablePlanes {
 		disabledPlanesData[i] = data.(string)
 	}
-
-	tfLicenseDetails := d.Get(("license_details")).(*schema.Map).Map()
-
 	tfRemoveLicense := d.Get("remove_licenses").(*schema.Set).List()
 	removeLicenseData := make([]string, len(tfRemoveLicense))
 	for i, data := range tfRemoveLicense {
@@ -94,17 +78,6 @@ func resourceLicenseCreate(ctx context.Context, d *schema.ResourceData, m interf
 	}
 	Id := userPrincipalName + ":" + skUID
 	d.SetId(Id)
-	return diags
-}
-
-func resourceLicenseRead(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
-	var diags diag.Diagnostics
-	return diags
-}
-
-func resourceLicenseUpdate(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
-
-	var diags diag.Diagnostics
 	return diags
 }
 
