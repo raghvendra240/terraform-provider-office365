@@ -281,6 +281,7 @@ func resourceUserUpdate(ctx context.Context, d *schema.ResourceData, m interface
 		Department:        d.Get("department").(string),
 		Country:           d.Get("country").(string),
 		State:             d.Get("state").(string),
+		UsageLocation:     d.Get("usage_location").(string),
 	}
 	var err error
 	retryErr := resource.Retry(2*time.Minute, func() *resource.RetryError {

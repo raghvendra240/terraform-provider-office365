@@ -25,21 +25,24 @@ func resourceLicense() *schema.Resource {
 				},
 				Optional: true,
 			},
-			"license details": {
-				Type: schema.TypeMap,
+			"remove_licenses": {
+				Type: schema.TypeSet,
 				Elem: &schema.Schema{
-					Type: schema.TypeSet,
-					Elem: &schema.Schema{
-						Type: schema.TypeString,
-					},
+					Type: schema.TypeString,
 				},
-				Required: true,
+				Optional: true,
+			},
+			"skuid": &schema.Schema{
+				Type:     schema.TypeString,
+				Optional: true,
 			},
 		},
 		Importer: &schema.ResourceImporter{
 			StateContext: resourceUserImporter,
 		},
 		CreateContext: resourceLicenseCreate,
+		ReadContext:   resourceLicenseRead,
+		UpdateContext: resourceLicenseUpdate,
 		DeleteContext: resourceLicenseDelete,
 	}
 }
@@ -78,6 +81,17 @@ func resourceLicenseCreate(ctx context.Context, d *schema.ResourceData, m interf
 	}
 	Id := userPrincipalName + ":" + skUID
 	d.SetId(Id)
+	return diags
+}
+
+func resourceLicenseRead(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
+	var diags diag.Diagnostics
+	return diags
+}
+
+func resourceLicenseUpdate(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
+
+	var diags diag.Diagnostics
 	return diags
 }
 
