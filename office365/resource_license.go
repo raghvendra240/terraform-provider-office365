@@ -2,6 +2,7 @@ package office365
 
 import (
 	"context"
+	"encoding/json"
 	"strings"
 	"terraform-provider-office365/client"
 
@@ -18,22 +19,40 @@ func resourceLicense() *schema.Resource {
 				Required: true,
 			},
 
-			"disabled_plans": {
-				Type: schema.TypeSet,
-				Elem: &schema.Schema{
-					Type: schema.TypeString,
-				},
+			"license_collection": &schema.Schema{
+				Type:     schema.TypeSet,
 				Optional: true,
+				Elem: &schema.Resource{
+					Schema: map[string]*schema.Schema{
+
+						"single_license": &schema.Schema{
+							Type:     schema.TypeSet,
+							Optional: true,
+							Elem: &schema.Resource{
+
+								Schema: map[string]*schema.Schema{
+									"disabled_plans": {
+										Type: schema.TypeSet,
+										Elem: &schema.Schema{
+											Type: schema.TypeString,
+										},
+										Optional: true,
+									},
+									"skuid": &schema.Schema{
+										Type:     schema.TypeString,
+										Optional: true,
+									},
+								},
+							},
+						},
+					},
+				},
 			},
 			"remove_licenses": {
 				Type: schema.TypeSet,
 				Elem: &schema.Schema{
 					Type: schema.TypeString,
 				},
-				Optional: true,
-			},
-			"skuid": &schema.Schema{
-				Type:     schema.TypeString,
 				Optional: true,
 			},
 		},
@@ -52,34 +71,58 @@ func resourceLicenseCreate(ctx context.Context, d *schema.ResourceData, m interf
 	var diags diag.Diagnostics
 
 	userPrincipalName := d.Get("user_principal_name").(string)
-	skUID := d.Get("skuid").(string)
+	var assignedLicenseArray []client.AssignedLicenses
 
-	tfDisablePlanes := d.Get("disabled_plans").(*schema.Set).List()
-	disabledPlanesData := make([]string, len(tfDisablePlanes))
-	for i, data := range tfDisablePlanes {
-		disabledPlanesData[i] = data.(string)
+	v := d.Get("license_collection")
+	licenseCollection := v.(*schema.Set).List()
+
+	for _, v := range licenseCollection {
+		singleLicenseSchema := v.(map[string]interface{})
+		singleLicense := singleLicenseSchema["single_license"].(*schema.Set).List()
+
+		for _, u := range singleLicense {
+
+			oneLicense := u.(map[string]interface{})
+			tfDisablePlanes := oneLicense["disabled_plans"].(*schema.Set).List()
+			disabledPlanesData := make([]string, len(tfDisablePlanes))
+			for i, data := range tfDisablePlanes {
+				disabledPlanesData[i] = data.(string)
+			}
+
+			oneAssignedLicense := client.AssignedLicenses{
+				Skid:          oneLicense["skuid"].(string),
+				DisabledPlans: disabledPlanesData,
+			}
+			assignedLicenseArray = append(assignedLicenseArray, oneAssignedLicense)
+
+		}
+
 	}
+
 	tfRemoveLicense := d.Get("remove_licenses").(*schema.Set).List()
 	removeLicenseData := make([]string, len(tfRemoveLicense))
 	for i, data := range tfRemoveLicense {
 		removeLicenseData[i] = data.(string)
 	}
-	assigned_json := client.AssignedLicenses{
-		DisabledPlans: disabledPlanesData,
-		Skid:          d.Get("skuid").(string),
-	}
-	assArray := make([]client.AssignedLicenses, 1)
-	assArray[0] = assigned_json
+
 	main_license := client.License{
-		AddLicenses:    assArray,
+		AddLicenses:    assignedLicenseArray,
 		RemoveLicenses: removeLicenseData,
 	}
 
 	err := c.CreateLicense(userPrincipalName, main_license)
 	if err != nil {
-		return diag.FromErr(err)
+		e, _ := json.Marshal(main_license)
+
+		diags = append(diags, diag.Diagnostic{
+			Severity: diag.Error,
+			Summary:  string(e),
+			Detail:   err.Error(),
+		})
+		return diags
+
 	}
-	Id := userPrincipalName + ":" + skUID
+	Id := userPrincipalName
 	d.SetId(Id)
 	return diags
 }
