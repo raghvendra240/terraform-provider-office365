@@ -2,7 +2,6 @@ package office365
 
 import (
 	"context"
-	"encoding/json"
 	"terraform-provider-office365/client"
 
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
@@ -12,6 +11,11 @@ import (
 func resourceLicense() *schema.Resource {
 	return &schema.Resource{
 		Schema: map[string]*schema.Schema{
+			"last_updated": &schema.Schema{
+				Type:     schema.TypeString,
+				Optional: true,
+				Computed: true,
+			},
 
 			"user_principal_name": &schema.Schema{
 				Type:     schema.TypeString,
@@ -68,7 +72,7 @@ func resourceLicenseCreate(ctx context.Context, d *schema.ResourceData, m interf
 		}
 
 		oneAssignedLicense := client.AssignedLicenses{
-			Skid:          singleLicenseSchema["skuid"].(string),
+			Skuid:         singleLicenseSchema["skuid"].(string),
 			DisabledPlans: disabledPlanesData,
 		}
 		assignedLicenseArray = append(assignedLicenseArray, oneAssignedLicense)
@@ -94,20 +98,16 @@ func resourceLicenseRead(ctx context.Context, d *schema.ResourceData, m interfac
 	res, err := c.GetLicense(d.Id())
 
 	if err != nil {
-		return diag.FromErr(&json.UnsupportedTypeError{})
+		return diag.FromErr(err)
+	}
+	var licenses []interface{}
+	for _, v := range res.Values {
+		License := make(map[string]string)
+		License["skuid"] = v.Skuid
+		licenses = append(licenses, License)
 	}
 
-	out, err := json.Marshal(res)
-	if err != nil {
-		panic(err)
-	}
-
-	diags = append(diags, diag.Diagnostic{
-		Severity: diag.Error,
-		Summary:  string(out),
-		Detail:   err.Error(),
-	})
-
+	d.Set("license_collection", licenses)
 	return diags
 }
 
@@ -140,9 +140,4 @@ func resourceLicenseDelete(ctx context.Context, d *schema.ResourceData, m interf
 	}
 	d.SetId("")
 	return diags
-}
-
-func resourceLicenseImporter(ctx context.Context, d *schema.ResourceData, m interface{}) ([]*schema.ResourceData, error) {
-
-	return []*schema.ResourceData{d}, nil
 }

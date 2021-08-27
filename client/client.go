@@ -35,7 +35,7 @@ type GetLicenseStruct struct{
 
 type AssignedLicenses struct {
 	DisabledPlans []string `json:"disabledPlans"`
-	Skid          string   `json:"skuId"`
+	Skuid          string   `json:"skuId"`
 }
 
 type License struct {
