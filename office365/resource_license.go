@@ -80,15 +80,7 @@ func resourceLicenseCreate(ctx context.Context, d *schema.ResourceData, m interf
 
 	err := c.CreateLicense(userPrincipalName, main_license)
 	if err != nil {
-		e, _ := json.Marshal(main_license)
-
-		diags = append(diags, diag.Diagnostic{
-			Severity: diag.Error,
-			Summary:  string(e),
-			Detail:   err.Error(),
-		})
-		return diags
-
+		return diag.FromErr(err)
 	}
 	Id := userPrincipalName
 	d.SetId(Id)
