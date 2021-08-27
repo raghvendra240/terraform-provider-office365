@@ -3,7 +3,6 @@ package office365
 import (
 	"context"
 	"encoding/json"
-	"strings"
 	"terraform-provider-office365/client"
 
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
@@ -24,36 +23,19 @@ func resourceLicense() *schema.Resource {
 				Optional: true,
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
-
-						"single_license": &schema.Schema{
-							Type:     schema.TypeSet,
-							Optional: true,
-							Elem: &schema.Resource{
-
-								Schema: map[string]*schema.Schema{
-									"disabled_plans": {
-										Type: schema.TypeSet,
-										Elem: &schema.Schema{
-											Type: schema.TypeString,
-										},
-										Optional: true,
-									},
-									"skuid": &schema.Schema{
-										Type:     schema.TypeString,
-										Optional: true,
-									},
-								},
+						"disabled_plans": {
+							Type: schema.TypeSet,
+							Elem: &schema.Schema{
+								Type: schema.TypeString,
 							},
+							Optional: true,
+						},
+						"skuid": &schema.Schema{
+							Type:     schema.TypeString,
+							Optional: true,
 						},
 					},
 				},
-			},
-			"remove_licenses": {
-				Type: schema.TypeSet,
-				Elem: &schema.Schema{
-					Type: schema.TypeString,
-				},
-				Optional: true,
 			},
 		},
 		Importer: &schema.ResourceImporter{
@@ -78,36 +60,22 @@ func resourceLicenseCreate(ctx context.Context, d *schema.ResourceData, m interf
 
 	for _, v := range licenseCollection {
 		singleLicenseSchema := v.(map[string]interface{})
-		singleLicense := singleLicenseSchema["single_license"].(*schema.Set).List()
 
-		for _, u := range singleLicense {
-
-			oneLicense := u.(map[string]interface{})
-			tfDisablePlanes := oneLicense["disabled_plans"].(*schema.Set).List()
-			disabledPlanesData := make([]string, len(tfDisablePlanes))
-			for i, data := range tfDisablePlanes {
-				disabledPlanesData[i] = data.(string)
-			}
-
-			oneAssignedLicense := client.AssignedLicenses{
-				Skid:          oneLicense["skuid"].(string),
-				DisabledPlans: disabledPlanesData,
-			}
-			assignedLicenseArray = append(assignedLicenseArray, oneAssignedLicense)
-
+		tfDisablePlanes := singleLicenseSchema["disabled_plans"].(*schema.Set).List()
+		disabledPlanesData := make([]string, len(tfDisablePlanes))
+		for i, data := range tfDisablePlanes {
+			disabledPlanesData[i] = data.(string)
 		}
 
-	}
+		oneAssignedLicense := client.AssignedLicenses{
+			Skid:          singleLicenseSchema["skuid"].(string),
+			DisabledPlans: disabledPlanesData,
+		}
+		assignedLicenseArray = append(assignedLicenseArray, oneAssignedLicense)
 
-	tfRemoveLicense := d.Get("remove_licenses").(*schema.Set).List()
-	removeLicenseData := make([]string, len(tfRemoveLicense))
-	for i, data := range tfRemoveLicense {
-		removeLicenseData[i] = data.(string)
 	}
-
 	main_license := client.License{
-		AddLicenses:    assignedLicenseArray,
-		RemoveLicenses: removeLicenseData,
+		AddLicenses: assignedLicenseArray,
 	}
 
 	err := c.CreateLicense(userPrincipalName, main_license)
@@ -129,6 +97,25 @@ func resourceLicenseCreate(ctx context.Context, d *schema.ResourceData, m interf
 
 func resourceLicenseRead(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
 	var diags diag.Diagnostics
+	c := m.(*client.Client)
+
+	res, err := c.GetLicense(d.Id())
+
+	if err != nil {
+		return diag.FromErr(&json.UnsupportedTypeError{})
+	}
+
+	out, err := json.Marshal(res)
+	if err != nil {
+		panic(err)
+	}
+
+	diags = append(diags, diag.Diagnostic{
+		Severity: diag.Error,
+		Summary:  string(out),
+		Detail:   err.Error(),
+	})
+
 	return diags
 }
 
@@ -141,17 +128,21 @@ func resourceLicenseUpdate(ctx context.Context, d *schema.ResourceData, m interf
 func resourceLicenseDelete(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
 	var diags diag.Diagnostics
 	c := m.(*client.Client)
-	partsOfId := ParseId(d.Id())
-	userPrincipalName := partsOfId[0]
-	SkUID := partsOfId[1]
 
-	skUidArray := make([]string, 1)
-	skUidArray[0] = SkUID
+	userPrincipalName := d.Id()
+	var SkuidCollection []string
 
-	licenseStruct := client.License{
-		RemoveLicenses: skUidArray,
+	v := d.Get("license_collection")
+	licenseCollection := v.(*schema.Set).List()
+	for _, v := range licenseCollection {
+		singleLicenseSchema := v.(map[string]interface{})
+		SkuidCollection = append(SkuidCollection, singleLicenseSchema["skuid"].(string))
+
 	}
-	err := c.CreateLicense(userPrincipalName, licenseStruct)
+	main_license := client.License{
+		RemoveLicenses: SkuidCollection,
+	}
+	err := c.CreateLicense(userPrincipalName, main_license)
 	if err != nil {
 		return diag.FromErr(err)
 	}
@@ -160,25 +151,6 @@ func resourceLicenseDelete(ctx context.Context, d *schema.ResourceData, m interf
 }
 
 func resourceLicenseImporter(ctx context.Context, d *schema.ResourceData, m interface{}) ([]*schema.ResourceData, error) {
-	c := m.(*client.Client)
-	UserInfo, err := c.GetUser(d.Id())
-	if err != nil {
-		return nil, err
-	}
-	d.Set("display_name", UserInfo.DisplayName)
-	d.Set("job_title", UserInfo.JobTitle)
-	d.Set("mail", UserInfo.Mail)
-	d.Set("user_principal_name", UserInfo.UserPrincipalName)
-	d.Set("office_location", UserInfo.OfficeLocation)
-	d.Set("mobile_phone", UserInfo.MobilePhone)
-	d.Set("preferred_language", UserInfo.PreferredLanguage)
-	d.Set("surname", UserInfo.Surname)
-	d.Set("object_id", UserInfo.ObjectId)
-	d.Set("given_name", UserInfo.GivenName)
-	return []*schema.ResourceData{d}, nil
-}
 
-func ParseId(id string) []string {
-	parts := strings.Split(id, ":")
-	return parts
+	return []*schema.ResourceData{d}, nil
 }
