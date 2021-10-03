@@ -31,7 +31,8 @@ func Provider() *schema.Provider {
 			},
 		},
 		ResourcesMap: map[string]*schema.Resource{
-			"office365_user": resourceUser(),
+			"office365_user":    resourceUser(),
+			"office365_license": resourceLicense(),
 		},
 		DataSourcesMap: map[string]*schema.Resource{
 			"office365_user": dataSourceUsers(),

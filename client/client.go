@@ -23,9 +23,17 @@ type User struct {
 	ObjectId          string `json:"id"`
 }
 
+type SkuidStruct struct {
+	Skuid string `json:"skuId"`
+}
+
+type GetLicenseStruct struct {
+	Values []SkuidStruct `json:"value"`
+}
+
 type AssignedLicenses struct {
 	DisabledPlans []string `json:"disabledPlans"`
-	Skid          string   `json:"skuId"`
+	Skuid         string   `json:"skuId"`
 }
 
 type License struct {
@@ -181,7 +189,6 @@ func (c *Client) CreateUser(userCreateInfo CreatUser) (*User, error) {
 }
 
 func (c *Client) CreateLicense(userId string, license_json License) error {
-
 	log.Println("Create Called")
 	reqb, err := json.Marshal(license_json)
 	if err != nil {
@@ -208,12 +215,6 @@ func (c *Client) CreateLicense(userId string, license_json License) error {
 	if err != nil {
 		return err
 	}
-	// user := User{}
-	// err = json.Unmarshal(body, &user)
-	// if err != nil {
-	// 	log.Println("[ERROR]: ", err)
-	// 	return err
-	// }
 	log.Println("License assigned")
 	if res.StatusCode >= 200 && res.StatusCode <= 299 {
 		return nil
@@ -221,6 +222,39 @@ func (c *Client) CreateLicense(userId string, license_json License) error {
 		return fmt.Errorf(string(body))
 	}
 
+}
+
+func (c *Client) GetLicense(userId string) (*GetLicenseStruct, error) {
+	principalName := userId
+	URL := c.BaseUrl + principalName + "/licenseDetails"
+	req, err := http.NewRequest("GET", URL, nil)
+	if err != nil {
+		log.Println("[ERROR]: ", err)
+		return nil, err
+	}
+	req.Header.Set("authorization", c.authToken)
+	res, err := c.httpClient.Do(req)
+	if err != nil {
+		log.Println("[ERROR]: ", err)
+		return nil, err
+	}
+	defer res.Body.Close()
+	body, err := ioutil.ReadAll(res.Body)
+	if err != nil {
+		log.Println("[ERROR]: ", err)
+		return nil, err
+	}
+	receivedLicenses := GetLicenseStruct{}
+	err = json.Unmarshal(body, &receivedLicenses)
+	if err != nil {
+		log.Println("[ERROR]: ", err)
+		return nil, err
+	}
+	if res.StatusCode >= 200 && res.StatusCode <= 299 {
+		return &receivedLicenses, nil
+	} else {
+		return nil, fmt.Errorf(string(body))
+	}
 }
 
 func (c *Client) UpdateUser(UserId string, userUpdateInfo UpdateUser) error {
